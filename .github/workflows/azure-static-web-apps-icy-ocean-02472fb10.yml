@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: read
     env:
-      # expõe o secret como env (pode usar no if:)
       AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
 
     steps:
@@ -31,20 +30,18 @@ jobs:
       - name: Build (Vite -> dist)
         run: npm run build
 
-      # roda só em push na main E se o env (derivado do secret) não estiver vazio
+      # Deploy só em push direto na main e se o secret existir
       - name: Deploy to Azure Static Web Apps
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.AZURE_STATIC_WEB_APPS_API_TOKEN != '' }}
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # Passa o token (mesmo env/secret)
-          azure_static_web_apps_api_token: ${{ env.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          # Use APENAS o deployment_token (algumas versões ignoram o outro nome)
           deployment_token: ${{ env.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
           app_location: "/"
           output_location: "dist"
           production_branch: "main"
           skip_app_build: true
-          skip_deploy_on_missing_secrets: true
 
   close_pull_request_job:
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}

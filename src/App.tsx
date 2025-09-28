@@ -1,4 +1,4 @@
-import RealtimeSpatialAnalysis from "./RealtimeSpatialAnalysis";
+import RealtimeSpatialAnalysis from "./src/RealtimeSpatialAnalysis";
 
 function App() {
   <div className="p-4 bg-emerald-600 text-white rounded-xl">
