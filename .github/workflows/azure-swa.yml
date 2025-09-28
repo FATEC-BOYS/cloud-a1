@@ -3,13 +3,12 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches: [ main ]
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches: [ main ]
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -20,28 +19,36 @@ jobs:
         with:
           node-version: '20.19.0'
 
-      - name: Install dependencies
+      - name: Install
         run: npm install
 
       - name: Build (Vite -> dist)
         run: npm run build
 
+      # 🧪 Debug: prova que o index da build NÃO referencia src/main.tsx
+      - name: Show dist/index.html and assert built
+        run: |
+          set -e
+          echo "----- dist/index.html (head) -----"
+          head -n 50 dist/index.html || true
+          echo "----- grep '/src/main.tsx' -----"
+          if grep -q "/src/main.tsx" dist/index.html; then
+            echo "ERRO: dist/index.html ainda referencia /src/main.tsx (não está buildado?)"
+            exit 1
+          else
+            echo "OK: dist/index.html aponta para assets/*.js"
+          fi
+          echo "----- list dist/assets -----"
+          ls -la dist/assets || true
+
+      # 🚀 Deploy: publique a pasta final (dist) diretamente
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
-          app_location: "."
-          output_location: "dist"
+          app_location: "dist"   # <<< publica a build pronta
+          output_location: ""    # <<< vazio, já estamos na pasta final
           production_branch: "main"
           skip_app_build: true
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-
-  close_pr_env:
-    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: close
+          # se estiver usando token:
+          # azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
