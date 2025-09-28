@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: read
     env:
-      # expõe o secret como ENV (mascado nos logs)
       AZURE_STATIC_WEB_APPS_API_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
 
     steps:
@@ -31,22 +30,20 @@ jobs:
       - name: Build (Vite -> dist)
         run: npm run build
 
-      # 🔎 DEBUG: prova que o secret chegou (sem expor o valor)
-      - name: Debug secret presence (masked)
+      # DEBUG: garante que o secret chegou e está "grande"
+      - name: Debug secret presence
         run: |
-          echo "Has token? $([[ -n \"$AZURE_STATIC_WEB_APPS_API_TOKEN\" ]] && echo YES || echo NO)"
-          node -e "const t=process.env.AZURE_STATIC_WEB_APPS_API_TOKEN||''; console.log('Token length:', t.length)"
+          if [ -z "$AZURE_STATIC_WEB_APPS_API_TOKEN" ]; then echo "Token AUSENTE"; exit 1; fi
+          echo "Token length: ${#AZURE_STATIC_WEB_APPS_API_TOKEN}"
 
-      # 🚀 Deploy: só em push na main e com secret presente
+      # DEPLOY: só em push direto na main
       - name: Deploy to Azure Static Web Apps
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.AZURE_STATIC_WEB_APPS_API_TOKEN != '' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # algumas versões usam 'deployment_token'; outras, 'azure_static_web_apps_api_token'
-          deployment_token: ${{ env.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          # USE SOMENTE ESTE INPUT (evita a action escolher OIDC)
           azure_static_web_apps_api_token: ${{ env.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
-          # Se o app está na raiz, use "." (mais seguro do que "/")
           app_location: "."
           output_location: "dist"
           production_branch: "main"
