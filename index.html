@@ -3,16 +3,69 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Meu App estático</title>
+    <title>Transmissão + Análise Espacial (HTML/JS/CSS)</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="container">
-      <h1>Olá 👋</h1>
-      <p>Agora é puro HTML + CSS + JS.</p>
-      <button id="btn">Clique</button>
-      <pre id="out"></pre>
+    <header class="topbar">
+      <h1>Transmissão em tempo real + Análise Espacial</h1>
+      <div class="status" id="status">parado</div>
+    </header>
+
+    <main class="layout">
+      <section class="stage">
+        <!-- video fica “offscreen”; canvas mostra o overlay analisado -->
+        <video id="video" playsinline muted></video>
+        <canvas id="view"></canvas>
+
+        <!-- HUD -->
+        <div class="hud">
+          <div><strong>FPS</strong>: <span id="fps">0</span></div>
+          <div><strong>Movimento</strong>: <span id="motion">0</span>%</div>
+          <div><strong>Centroid</strong>: <span id="centroid">-</span></div>
+          <div><strong>Entradas ROI</strong>: <span id="roiCount">0</span></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Controles</h2>
+        <div class="grid">
+          <label>Resolução</label>
+          <select id="resolution">
+            <option value="1280x720">1280×720</option>
+            <option value="640x480" selected>640×480</option>
+            <option value="320x240">320×240</option>
+          </select>
+
+          <label>Sensibilidade</label>
+          <input id="threshold" type="range" min="5" max="80" value="20" />
+          <small class="muted">Quanto menor, mais sensível ao movimento</small>
+
+          <label>Mostrar máscara</label>
+          <input id="showMask" type="checkbox" />
+
+          <label>Desenhar ROI</label>
+          <input id="drawRoi" type="checkbox" />
+
+          <button id="start">Iniciar câmera</button>
+          <button id="stop" class="danger" disabled>Parar</button>
+          <button id="resetRoi" class="ghost">Limpar ROIs</button>
+        </div>
+
+        <hr/>
+        <h3>Como usar ROIs</h3>
+        <ol>
+          <li>Marque “Desenhar ROI”.</li>
+          <li>Clique e arraste no vídeo para criar uma região.</li>
+          <li>Quando o <em>centroid</em> do maior movimento entrar na ROI, a contagem sobe.</li>
+        </ol>
+      </aside>
     </main>
-    <script src="./main.js" type="module"></script>
+
+    <footer class="foot">
+      Feito só com HTML, CSS e JS • getUserMedia + Canvas 2D • Sem libs
+    </footer>
+
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

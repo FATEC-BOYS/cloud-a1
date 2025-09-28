@@ -1,0 +1,66 @@
+:root {
+  --bg: #0e1117;
+  --panel: #151a23;
+  --text: #e6edf3;
+  --muted: #a6b3c2;
+  --accent: #6aa3ff;
+  --danger: #ff6b6b;
+  --ok: #2ecc71;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial;
+}
+
+.topbar {
+  display: flex; gap: 16px; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid #202632; background: #0f1420;
+}
+.topbar h1 { font-size: 16px; margin: 0; }
+.status { padding: 4px 10px; border-radius: 999px; background: #2b3342; color: #cfe1ff; }
+
+.layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; padding: 16px; }
+@media (max-width: 900px){ .layout { grid-template-columns: 1fr; } }
+
+.stage { position: relative; background: #0b0e14; border: 1px solid #202632; border-radius: 14px; overflow: hidden; }
+#video { display: none; } /* offscreen */
+#view { display: block; width: 100%; height: auto; background: #000; }
+
+.hud {
+  position: absolute; left: 12px; bottom: 12px;
+  display: grid; gap: 4px;
+  background: rgba(0,0,0,.5); padding: 8px 10px; border-radius: 10px;
+  backdrop-filter: blur(2px);
+}
+.hud strong { color: var(--accent); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid #202632;
+  border-radius: 14px; padding: 16px;
+}
+.panel h2 { margin-top: 0; }
+.grid { display: grid; gap: 10px; }
+.muted { color: var(--muted); }
+
+button, select, input[type="range"], input[type="checkbox"] {
+  font: inherit;
+}
+button {
+  padding: 10px 14px; border: 1px solid #2a3445; border-radius: 10px;
+  background: #1a2230; color: var(--text); cursor: pointer;
+}
+button:hover { filter: brightness(1.05); }
+button.danger { border-color: #3e2626; background: #2a1717; color: #ffd7d7; }
+button.ghost { background: transparent; border-style: dashed; }
+
+.foot {
+  text-align: center; padding: 14px; color: var(--muted);
+  border-top: 1px solid #202632; background: #0f1420;
+}
+
+/* ROI rectangles */
+.roi { outline: 2px dashed rgba(255,255,255,.35); }
